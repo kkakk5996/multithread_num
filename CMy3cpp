@@ -1,0 +1,65 @@
+#include <afxwin.h>
+#include <iostream>
+#include <vector>
+#include <thread>
+
+class CMinValueThread : public CWinThread {
+public:
+    DECLARE_DYNCREATE(CMinValueThread)
+
+    CMinValueThread() {} // 생성자
+
+    virtual BOOL InitInstance() {
+        return TRUE;
+    }
+
+    virtual int Run() {
+        int minValue = numbers_[0];
+
+        // 입력된 숫자 중 최솟값 찾기
+        for (int i = 1; i < numbers_.size(); ++i) {
+            if (numbers_[i] < minValue) {
+                minValue = numbers_[i];
+            }
+        }
+
+        // 결과 출력
+        std::cout << "최솟값: " << minValue << std::endl;
+
+        return 0;
+    }
+
+    void SetNumbers(const std::vector<int>& numbers) {
+        numbers_ = numbers;
+    }
+
+private:
+    std::vector<int> numbers_;
+};
+
+BEGIN_MESSAGE_MAP(CMinValueThreadApp, CWinApp)
+END_MESSAGE_MAP()
+
+CMinValueThreadApp theApp;
+
+int main() {
+    AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0);
+
+    std::vector<int> inputNumbers;
+    int num;
+
+    // 10개의 정수값 입력 받기
+    std::cout << "10개의 정수를 입력하세요: " << std::endl;
+    for (int i = 0; i < 10; ++i) {
+        std::cin >> num;
+        inputNumbers.push_back(num);
+    }
+
+    // 쓰레드 생성
+    CMinValueThread* pThread = (CMinValueThread*)AfxBeginThread(RUNTIME_CLASS(CMinValueThread));
+    if (pThread != nullptr) {
+        pThread->SetNumbers(inputNumbers);
+    }
+
+    return theApp.Run();
+}
